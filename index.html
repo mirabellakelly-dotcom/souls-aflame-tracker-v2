@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#3D1F6B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Souls Aflame">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Souls Aflame</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--purple:#6B3FA0;--purple-light:#9B6FD0;--purple-pale:#EDE8F5;--purple-dark:#3D1F6B;--gold:#C9964A;--green:#2E9E6B;--green-pale:#E8F5EE;--red:#D94F4F;--red-pale:#FDF0F0;--blue:#3A7BD5;--blue-pale:#EAF1FB;--bg:#F7F5FB;--card:#FFFFFF;--text:#1A1025;--text-soft:#7A6895;--border:#E2D9F3;--radius:16px;--shadow:0 2px 16px rgba(107,63,160,0.10);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:90px;overscroll-behavior:none;}
+.topbar{background:var(--purple-dark);padding:env(safe-area-inset-top,0px) 20px 14px;padding-top:calc(env(safe-area-inset-top,0px) + 18px);position:sticky;top:0;z-index:100;}
+.topbar-title{font-family:'Playfair Display',serif;font-size:18px;color:white;}
+.topbar-sub{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:white;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -4px 20px rgba(107,63,160,0.08);padding-bottom:env(safe-area-inset-bottom,0px);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;border:none;background:none;gap:3px;transition:all 0.2s;}
+.nav-icon{font-size:20px;line-height:1;}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:0.5px;color:var(--text-soft);}
+.nav-item.active .nav-label{color:var(--purple);}
+.nav-item.active .nav-icon{transform:translateY(-2px);}
+.page{display:none;padding:16px;animation:fadeIn 0.2s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px;border:1px solid var(--border);}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--purple-dark);margin-bottom:4px;}
+.section-sub{font-size:12px;color:var(--text-soft);margin-bottom:16px;}
+.stat-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.stat-pill{flex:1;min-width:70px;background:var(--purple-pale);border-radius:12px;padding:11px 8px;text-align:center;}
+.stat-pill.green{background:var(--green-pale);}
+.stat-pill.red{background:var(--red-pale);}
+.stat-pill.blue{background:var(--blue-pale);}
+.stat-pill.gold{background:#FDF5E8;}
+.stat-num{font-size:24px;font-weight:700;color:var(--purple);line-height:1;}
+.stat-pill.green .stat-num{color:var(--green);}
+.stat-pill.red .stat-num{color:var(--red);}
+.stat-pill.blue .stat-num{color:var(--blue);}
+.stat-pill.gold .stat-num{color:var(--gold);}
+.stat-lbl{font-size:9px;color:var(--text-soft);margin-top:3px;letter-spacing:0.3px;font-weight:600;text-transform:uppercase;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-soft);margin-bottom:5px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text);background:var(--bg);outline:none;transition:border-color 0.2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--purple-light);background:white;}
+.form-textarea{resize:vertical;min-height:70px;}
+.form-row{display:flex;gap:10px;}
+.form-row .form-group{flex:1;}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.18s;letter-spacing:0.3px;}
+.btn-primary{background:var(--purple);color:white;}
+.btn-primary:active{background:var(--purple-dark);transform:scale(0.98);}
+.btn-sm{width:auto;padding:7px 14px;font-size:12px;border-radius:8px;font-weight:600;}
+.btn-ghost{background:var(--purple-pale);color:var(--purple);}
+.btn-danger{background:var(--red-pale);color:var(--red);}
+.btn-green{background:var(--green-pale);color:var(--green);}
+.btn-blue{background:var(--blue-pale);color:var(--blue);}
+.btn-gold{background:#FDF5E8;color:var(--gold);}
+.list-item{background:white;border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:9px;}
+.list-item-name{font-weight:600;font-size:15px;color:var(--text);}
+.list-item-sub{font-size:12px;color:var(--text-soft);margin-top:2px;}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:var(--green-pale);color:var(--green);}
+.badge-red{background:var(--red-pale);color:var(--red);}
+.badge-purple{background:var(--purple-pale);color:var(--purple);}
+.badge-gold{background:#FDF5E8;color:var(--gold);}
+.badge-blue{background:var(--blue-pale);color:var(--blue);}
+.badge-grey{background:#F0EEF5;color:#888;}
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px;}
+.month-btn{padding:9px 4px;border-radius:9px;border:1.5px solid var(--border);background:white;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--text-soft);cursor:pointer;transition:all 0.15s;text-align:center;}
+.month-btn.paid{background:var(--green);border-color:var(--green);color:white;}
+.month-btn.current{border-color:var(--purple);color:var(--purple);font-weight:700;}
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid var(--border);border-radius:12px;font-family:'Outfit',sans-serif;font-size:14px;background:white;outline:none;}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-soft);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,10,60,0.45);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:24px 24px 0 0;padding:20px 20px 36px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;animation:slideUp 0.25s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 18px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--purple-dark);margin-bottom:16px;}
+.tabs{display:flex;background:var(--purple-pale);border-radius:12px;padding:4px;margin-bottom:16px;gap:3px;overflow-x:auto;}
+.tab{flex:1;min-width:fit-content;padding:8px 6px;border:none;border-radius:9px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;background:none;color:var(--text-soft);transition:all 0.18s;white-space:nowrap;}
+.tab.active{background:white;color:var(--purple);box-shadow:0 1px 6px rgba(107,63,160,0.12);}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.empty{text-align:center;padding:32px 20px;color:var(--text-soft);}
+.empty-icon{font-size:36px;margin-bottom:8px;}
+.empty-text{font-size:14px;}
+.svc-card{background:white;border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:9px;cursor:pointer;}
+.svc-card-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.svc-date{font-weight:700;font-size:14px;color:var(--text);}
+.svc-type{font-size:11px;color:var(--text-soft);margin-top:2px;}
+.svc-nums{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;}
+.svc-num{font-size:11px;color:var(--text-soft);}
+.svc-num span{font-weight:700;color:var(--purple);}
+.share-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--purple-dark);color:white;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+.month-nav{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:12px;}
+.month-nav-btn{border:none;background:none;font-size:22px;cursor:pointer;color:var(--purple);padding:2px 8px;line-height:1;}
+.month-nav-title{font-weight:700;font-size:15px;color:var(--purple-dark);text-align:center;}
+.month-nav-hint{font-size:10px;color:var(--text-soft);text-align:center;}
+.yr-table-wrap{overflow-x:auto;}
+.yr-table{width:100%;border-collapse:collapse;font-size:11px;}
+.yr-table th{background:var(--purple);color:white;padding:7px 5px;text-align:center;font-weight:700;font-size:9px;letter-spacing:0.5px;white-space:nowrap;}
+.yr-table th:first-child{text-align:left;}
+.yr-table td{padding:7px 5px;text-align:center;border-bottom:1px solid var(--border);color:var(--text);font-size:11px;}
+.yr-table td:first-child{text-align:left;font-weight:600;color:var(--purple-dark);font-size:10px;}
+.yr-table tr:nth-child(even) td{background:#faf8ff;}
+.yr-table tr.totals-row td{background:var(--purple-pale);font-weight:700;color:var(--purple);border-top:2px solid var(--purple);}
+.yr-table tr.cur-row td{background:#EDE8F5;}
+.contact-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:white;border:1px solid var(--border);border-radius:12px;margin-bottom:8px;gap:10px;}
+.contact-name{font-weight:600;font-size:14px;color:var(--text);}
+.contact-sub{font-size:11px;color:var(--text-soft);margin-top:2px;}
+.contact-toggle{border:none;border-radius:20px;padding:7px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.18s;white-space:nowrap;flex-shrink:0;}
+.contact-toggle.called{background:var(--green);color:white;}
+.contact-toggle.not-called{background:var(--red-pale);color:var(--red);}
+.p-stat-section{background:white;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.p-stat-title{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.sub-divider{height:1px;background:var(--border);margin:12px 0;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-title">Souls Aflame</div>
+  <div class="topbar-sub" id="topbar-month"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- PAGE: PARTNERSHIP -->
+<div class="page active" id="page-partnership">
+  <div style="margin:4px 0 10px;"><div class="section-title">Partnership</div><div class="section-sub">Commitments & monthly redemptions</div></div>
+  <div class="tabs" id="ptabs">
+    <button class="tab active" onclick="switchPartnerTab('records',this)">Records</button>
+    <button class="tab" onclick="switchPartnerTab('monthly',this)">Monthly</button>
+    <button class="tab" onclick="switchPartnerTab('yearly',this)">Yearly</button>
+    <button class="tab" onclick="switchPartnerTab('contact',this)">Contact</button>
+  </div>
+  <div id="pt-records">
+    <div class="stat-row">
+      <div class="stat-pill"><div class="stat-num" id="ps-total">0</div><div class="stat-lbl">Partners</div></div>
+      <div class="stat-pill green"><div class="stat-num" id="ps-paid">0</div><div class="stat-lbl">Paid</div></div>
+      <div class="stat-pill red"><div class="stat-num" id="ps-unpaid">0</div><div class="stat-lbl">Unpaid</div></div>
+    </div>
+    <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="partner-search" placeholder="Search partners..." oninput="renderPartners()"></div>
+    <div class="tabs" id="pfilter-tabs">
+      <button class="tab active" onclick="filterPartners('all',this)">All</button>
+      <button class="tab" onclick="filterPartners('paid',this)">Paid</button>
+      <button class="tab" onclick="filterPartners('unpaid',this)">Unpaid</button>
+    </div>
+    <div id="partner-list"></div>
+    <button class="btn btn-primary" onclick="openModal('modal-add-partner')">+ Add Partner</button>
+  </div>
+  <div id="pt-monthly" style="display:none;">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changePartnerMonth(-1)">‹</button>
+      <div><div class="month-nav-title" id="pm-label"></div><div class="month-nav-hint">Monthly stats</div></div>
+      <button class="month-nav-btn" onclick="changePartnerMonth(1)">›</button>
+    </div>
+    <div id="pm-content"></div>
+  </div>
+  <div id="pt-yearly" style="display:none;">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changePartnerYear(-1)">‹</button>
+      <div><div class="month-nav-title" id="py-label"></div><div class="month-nav-hint">Yearly stats</div></div>
+      <button class="month-nav-btn" onclick="changePartnerYear(1)">›</button>
+    </div>
+    <div id="py-content"></div>
+  </div>
+  <div id="pt-contact" style="display:none;">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changePartnerContactMonth(-1)">‹</button>
+      <div><div class="month-nav-title" id="pc-label"></div><div class="month-nav-hint">Tap to toggle called</div></div>
+      <button class="month-nav-btn" onclick="changePartnerContactMonth(1)">›</button>
+    </div>
+    <div class="stat-row" id="pc-stats"></div>
+    <div id="partner-contact-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: MEMBERS -->
+<div class="page" id="page-members">
+  <div style="margin:4px 0 10px;"><div class="section-title">New Members</div><div class="section-sub">Follow-up & retention tracking</div></div>
+  <div class="tabs" id="mtabs">
+    <button class="tab active" onclick="switchMemberTab('records',this)">Records</button>
+    <button class="tab" onclick="switchMemberTab('contact',this)">Contact Tracker</button>
+  </div>
+  <div id="mt-records">
+    <div class="stat-row">
+      <div class="stat-pill"><div class="stat-num" id="ms-total">0</div><div class="stat-lbl">Total</div></div>
+      <div class="stat-pill green"><div class="stat-num" id="ms-serving">0</div><div class="stat-lbl">Serving</div></div>
+      <div class="stat-pill blue"><div class="stat-num" id="ms-member">0</div><div class="stat-lbl">Member</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-pill gold"><div class="stat-num" id="ms-returned">0</div><div class="stat-lbl">Returned</div></div>
+      <div class="stat-pill red"><div class="stat-num" id="ms-notreturned">0</div><div class="stat-lbl">Not Returned</div></div>
+      <div class="stat-pill"><div class="stat-num" id="ms-pending">0</div><div class="stat-lbl">Not Called</div></div>
+    </div>
+    <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="member-search" placeholder="Search members..." oninput="renderMembers()"></div>
+    <div class="tabs" id="mfilter-tabs">
+      <button class="tab active" onclick="filterMembers('all',this)">All</button>
+      <button class="tab" onclick="filterMembers('serving',this)">Serving</button>
+      <button class="tab" onclick="filterMembers('member',this)">Member</button>
+      <button class="tab" onclick="filterMembers('returned',this)">Returned</button>
+      <button class="tab" onclick="filterMembers('not-returned',this)">Not Returned</button>
+    </div>
+    <div id="member-list"></div>
+    <button class="btn btn-primary" onclick="openModal('modal-add-member')">+ Add New Member</button>
+  </div>
+  <div id="mt-contact" style="display:none;">
+    <div class="card" style="padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:1px;">Week of</div>
+      <div style="font-size:15px;font-weight:700;color:var(--purple-dark);margin-top:3px;" id="mc-week-label"></div>
+      <div style="font-size:11px;color:var(--text-soft);margin-top:2px;">Resets automatically each week</div>
+    </div>
+    <div class="stat-row" id="mc-stats"></div>
+    <div id="member-contact-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: STATISTICS -->
+<div class="page" id="page-stats">
+  <div style="margin:4px 0 10px;"><div class="section-title">Statistics</div><div class="section-sub">Service records & reports</div></div>
+  <div class="tabs" id="stabs">
+    <button class="tab active" onclick="switchStatsTab('monthly',this)">Monthly</button>
+    <button class="tab" onclick="switchStatsTab('yearly',this)">Yearly</button>
+  </div>
+  <div id="st-monthly">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeStatsMonth(-1)">‹</button>
+      <div><div class="month-nav-title" id="stats-month-label"></div><div class="month-nav-hint">tap arrows to browse</div></div>
+      <button class="month-nav-btn" onclick="changeStatsMonth(1)">›</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat-pill"><div class="stat-num" id="st-services">0</div><div class="stat-lbl">Services</div></div>
+      <div class="stat-pill blue"><div class="stat-num" id="st-adults">0</div><div class="stat-lbl">Adults</div></div>
+      <div class="stat-pill green"><div class="stat-num" id="st-kids">0</div><div class="stat-lbl">Kids</div></div>
+      <div class="stat-pill gold"><div class="stat-num" id="st-firsttimers">0</div><div class="stat-lbl">1st Timers</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-pill red"><div class="stat-num" id="st-visitors">0</div><div class="stat-lbl">Visitors</div></div>
+      <div class="stat-pill"><div class="stat-num" id="st-total-att">0</div><div class="stat-lbl">Total Att.</div></div>
+    </div>
+    <div class="share-row">
+      <button class="btn btn-sm btn-green" onclick="shareMonthly('plain')">📋 Copy</button>
+      <button class="btn btn-sm btn-gold" onclick="shareMonthly('whatsapp')">💬 WhatsApp</button>
+      <button class="btn btn-sm btn-blue" onclick="shareMonthly('share')">↗ Share</button>
+    </div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div style="font-weight:700;font-size:14px;color:var(--purple-dark);">Service Records</div>
+      <button class="btn btn-sm btn-ghost" onclick="openModal('modal-add-service')">+ Log Service</button>
+    </div>
+    <div id="service-list"></div>
+  </div>
+  <div id="st-yearly" style="display:none;">
+    <div class="month-nav">
+      <button class="month-nav-btn" onclick="changeStatsYear(-1)">‹</button>
+      <div><div class="month-nav-title" id="stats-year-label"></div><div class="month-nav-hint">yearly overview</div></div>
+      <button class="month-nav-btn" onclick="changeStatsYear(1)">›</button>
+    </div>
+    <div class="share-row" style="margin-bottom:12px;">
+      <button class="btn btn-sm btn-green" onclick="shareYearly('plain')">📋 Copy</button>
+      <button class="btn btn-sm btn-gold" onclick="shareYearly('whatsapp')">💬 WhatsApp</button>
+      <button class="btn btn-sm btn-blue" onclick="shareYearly('share')">↗ Share</button>
+    </div>
+    <div class="yr-table-wrap"><table class="yr-table" id="yearly-table"></table></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="switchPage('partnership',this)"><span class="nav-icon">🤝</span><span class="nav-label">Partnership</span></button>
+  <button class="nav-item" onclick="switchPage('members',this)"><span class="nav-icon">👥</span><span class="nav-label">Members</span></button>
+  <button class="nav-item" onclick="switchPage('stats',this)"><span class="nav-icon">📊</span><span class="nav-label">Statistics</span></button>
+</nav>
+
+<!-- MODAL: ADD PARTNER -->
+<div class="modal-overlay" id="modal-add-partner" onclick="closeModalOutside(event,'modal-add-partner')">
+  <div class="modal"><div class="modal-handle"></div><div class="modal-title">Add Partner</div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="p-name" placeholder="e.g. Adaeze Okonkwo"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="p-phone" type="tel" placeholder="08012345678"></div>
+      <div class="form-group"><label class="form-label">Pledge (₦)</label><input class="form-input" id="p-pledge" type="number" placeholder="5000"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Start Month</label>
+      <select class="form-select" id="p-start">
+        <option value="0">January</option><option value="1">February</option><option value="2">March</option><option value="3">April</option><option value="4">May</option><option value="5">June</option><option value="6">July</option><option value="7">August</option><option value="8">September</option><option value="9">October</option><option value="10">November</option><option value="11">December</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="addPartner()">Save Partner</button>
+    <button class="btn btn-ghost" style="margin-top:8px;" onclick="closeModal('modal-add-partner')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: PARTNER DETAIL -->
+<div class="modal-overlay" id="modal-partner-detail" onclick="closeModalOutside(event,'modal-partner-detail')">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-title" id="pd-name"></div>
+    <div style="font-size:13px;color:var(--text-soft);margin-bottom:4px;" id="pd-phone"></div>
+    <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;"><span class="badge badge-purple" id="pd-pledge"></span><span style="font-size:12px;color:var(--text-soft);" id="pd-balance"></span></div>
+    <div class="divider"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Tap month to toggle paid</div>
+    <div class="month-grid" id="pd-months"></div>
+    <div class="divider"></div>
+    <div class="share-row">
+      <button class="btn btn-sm btn-green" onclick="sharePartnerRecord('plain')">📋 Copy</button>
+      <button class="btn btn-sm btn-gold" onclick="sharePartnerRecord('whatsapp')">💬 WhatsApp</button>
+      <button class="btn btn-sm btn-blue" onclick="sharePartnerRecord('share')">↗ Share</button>
+    </div>
+    <div style="margin-top:10px;"><button class="btn btn-danger btn-sm" onclick="deletePartner()">Delete Partner</button></div>
+    <button class="btn btn-ghost" style="margin-top:8px;width:100%;" onclick="closeModal('modal-partner-detail')">Close</button>
+  </div>
+</div>
+
+<!-- MODAL: ADD MEMBER -->
+<div class="modal-overlay" id="modal-add-member" onclick="closeModalOutside(event,'modal-add-member')">
+  <div class="modal"><div class="modal-handle"></div><div class="modal-title">Add New Member</div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="m-name" placeholder="e.g. Chukwuemeka Bello"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="m-phone" type="tel" placeholder="08012345678"></div>
+      <div class="form-group"><label class="form-label">First Attended</label><input class="form-input" id="m-date" type="date"></div>
+    </div>
+    <button class="btn btn-primary" onclick="addMember()">Save Member</button>
+    <button class="btn btn-ghost" style="margin-top:8px;" onclick="closeModal('modal-add-member')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: MEMBER DETAIL -->
+<div class="modal-overlay" id="modal-member-detail" onclick="closeModalOutside(event,'modal-member-detail')">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-title" id="md-name"></div>
+    <div style="font-size:13px;color:var(--text-soft);margin-bottom:14px;" id="md-info"></div>
+    <div class="form-group"><label class="form-label">Follow-up Status</label>
+      <select class="form-select" id="md-followup" onchange="updateMemberField('followup',this.value)">
+        <option value="not-contacted">Not Contacted</option><option value="contacted">Contacted</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Retention Status</label>
+      <select class="form-select" id="md-retention" onchange="updateMemberField('retention',this.value)">
+        <option value="unknown">Unknown</option>
+        <option value="returned">Returned After First Time</option>
+        <option value="member">Became a Member</option>
+        <option value="serving">Became a Serving Member</option>
+        <option value="not-returned">Did Not Return</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="md-notes" placeholder="Any notes..." onchange="updateMemberField('notes',this.value)"></div>
+    <div class="divider"></div>
+    <button class="btn btn-danger btn-sm" onclick="deleteMember()">Delete Member</button>
+    <button class="btn btn-ghost" style="margin-top:8px;width:100%;" onclick="closeModal('modal-member-detail')">Close</button>
+  </div>
+</div>
+
+<!-- MODAL: LOG SERVICE -->
+<div class="modal-overlay" id="modal-add-service" onclick="closeModalOutside(event,'modal-add-service')">
+  <div class="modal"><div class="modal-handle"></div><div class="modal-title">Log Service</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="svc-date" type="date"></div>
+      <div class="form-group"><label class="form-label">Service Type</label>
+        <select class="form-select" id="svc-type" onchange="toggleCustomService()">
+          <option value="Sunday Service">Sunday Service</option>
+          <option value="Mid-Week Service">Mid-Week Service</option>
+          <option value="other">Other...</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" id="svc-custom-wrap" style="display:none;"><label class="form-label">Service Name</label><input class="form-input" id="svc-custom" placeholder="e.g. Prayer Night, Convention..."></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Adults</label><input class="form-input" id="svc-adults" type="number" placeholder="0" oninput="autoCalcTotal()"></div>
+      <div class="form-group"><label class="form-label">Kids</label><input class="form-input" id="svc-kids" type="number" placeholder="0" oninput="autoCalcTotal()"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">First Timers</label><input class="form-input" id="svc-firsttimers" type="number" placeholder="0" oninput="autoCalcTotal()"></div>
+      <div class="form-group"><label class="form-label">Visitors</label><input class="form-input" id="svc-visitors" type="number" placeholder="0" oninput="autoCalcTotal()"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Total <span style="font-size:9px;background:var(--purple-pale);color:var(--purple);padding:2px 6px;border-radius:4px;font-weight:700;">AUTO</span></label>
+      <input class="form-input" id="svc-total" type="number" placeholder="Auto-calculated or override" style="font-weight:700;">
+    </div>
+    <div class="form-group"><label class="form-label">Remarks</label><textarea class="form-textarea" id="svc-notes" placeholder="Any notes about this service..."></textarea></div>
+    <button class="btn btn-primary" onclick="addService()">Save Record</button>
+    <button class="btn btn-ghost" style="margin-top:8px;" onclick="closeModal('modal-add-service')">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: SERVICE DETAIL -->
+<div class="modal-overlay" id="modal-service-detail" onclick="closeModalOutside(event,'modal-service-detail')">
+  <div class="modal"><div class="modal-handle"></div>
+    <div class="modal-title" id="svd-title"></div>
+    <div style="font-size:13px;color:var(--text-soft);margin-bottom:14px;" id="svd-date"></div>
+    <div class="stat-row" id="svd-stats"></div>
+    <div id="svd-notes-wrap" style="display:none;">
+      <div class="divider"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Remarks</div>
+      <div style="font-size:14px;color:var(--text);" id="svd-notes"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="share-row">
+      <button class="btn btn-sm btn-green" onclick="shareService('plain')">📋 Copy</button>
+      <button class="btn btn-sm btn-gold" onclick="shareService('whatsapp')">💬 WhatsApp</button>
+      <button class="btn btn-sm btn-blue" onclick="shareService('share')">↗ Share</button>
+    </div>
+    <div style="margin-top:10px;"><button class="btn btn-danger btn-sm" onclick="deleteService()">Delete Record</button></div>
+    <button class="btn btn-ghost" style="margin-top:8px;width:100%;" onclick="closeModal('modal-service-detail')">Close</button>
+  </div>
+</div>
+
+<script>
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MF=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const NOW=new Date(),CM=NOW.getMonth(),CY=NOW.getFullYear();
+
+function getWeekKey(d=new Date()){const j=new Date(d.getFullYear(),0,1);const w=Math.ceil(((d-j)/86400000+j.getDay()+1)/7);return d.getFullYear()+'-W'+String(w).padStart(2,'0');}
+function getWeekStart(d=new Date()){const day=d.getDay();const diff=d.getDate()-(day===0?6:day-1);return new Date(d.getFullYear(),d.getMonth(),diff);}
+
+let S={partners:[],members:[],services:[],pContacts:{},mContacts:{}};
+let pFilter='all',mFilter='all',activePid=null,activeMid=null,activeSid=null;
+let sMonth=CM,sYear=CY,sYearView=CY;
+let pmMonth=CM,pmYear=CY,pyYear=CY,pcMonth=CM,pcYear=CY;
+
+function save(){try{localStorage.setItem('sacc-v3',JSON.stringify(S));}catch(e){}}
+function load(){
+  try{
+    const r=localStorage.getItem('sacc-v3')||localStorage.getItem('sacc-v2');
+    if(r){const d=JSON.parse(r);S={...S,...d};if(!S.pContacts)S.pContacts={};if(!S.mContacts)S.mContacts={};}
+  }catch(e){}
+}
+
+function init(){
+  load();
+  document.getElementById('topbar-month').textContent=NOW.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  document.getElementById('p-start').value=CM;
+  document.getElementById('svc-date').value=NOW.toISOString().split('T')[0];
+  document.getElementById('m-date').value=NOW.toISOString().split('T')[0];
+  updateWeekLabel();renderAll();
+}
+
+function renderAll(){
+  renderPartners();updatePartnerStats();
+  renderMembers();updateMemberStats();
+  renderStats();renderPMonthly();renderPYearly();renderPContact();renderMContact();
+}
+
+function switchPage(n,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');btn.classList.add('active');
+  if(n==='stats')renderStats();
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModalOutside(e,id){if(e.target.id===id)closeModal(id);}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+function doShare(text,mode){
+  if(mode==='plain'){if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>toast('Copied ✓')).catch(()=>fbCopy(text));}else fbCopy(text);}
+  else if(mode==='whatsapp'){window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');}
+  else if(mode==='share'){if(navigator.share)navigator.share({text}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>toast('Copied ✓'));}
+}
+function fbCopy(t){const e=document.createElement('textarea');e.value=t;document.body.appendChild(e);e.select();document.execCommand('copy');document.body.removeChild(e);toast('Copied ✓');}
+
+// ── PARTNER TABS ──
+function switchPartnerTab(tab,btn){
+  ['pt-records','pt-monthly','pt-yearly','pt-contact'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelectorAll('#ptabs .tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pt-'+tab).style.display='block';btn.classList.add('active');
+  if(tab==='monthly')renderPMonthly();
+  if(tab==='yearly')renderPYearly();
+  if(tab==='contact')renderPContact();
+}
+
+// ── PARTNER RECORDS ──
+function addPartner(){
+  const name=document.getElementById('p-name').value.trim();
+  const phone=document.getElementById('p-phone').value.trim();
+  const pledge=parseFloat(document.getElementById('p-pledge').value)||0;
+  const startMonth=parseInt(document.getElementById('p-start').value);
+  if(!name){toast('Please enter a name');return;}
+  S.partners.push({id:Date.now(),name,phone,pledge,startMonth,paid:[]});
+  save();renderPartners();updatePartnerStats();renderPMonthly();renderPYearly();renderPContact();
+  closeModal('modal-add-partner');
+  ['p-name','p-phone','p-pledge'].forEach(id=>document.getElementById(id).value='');
+  toast('Partner added ✓');
+}
+
+function deletePartner(){
+  if(!confirm('Delete this partner?'))return;
+  S.partners=S.partners.filter(p=>p.id!==activePid);
+  save();renderPartners();updatePartnerStats();renderPMonthly();renderPYearly();renderPContact();
+  closeModal('modal-partner-detail');toast('Deleted');
+}
+
+function openPartnerDetail(id){
+  const p=S.partners.find(x=>x.id===id);if(!p)return;
+  activePid=id;
+  document.getElementById('pd-name').textContent=p.name;
+  document.getElementById('pd-phone').textContent=p.phone||'No phone recorded';
+  document.getElementById('pd-pledge').textContent='₦'+p.pledge.toLocaleString()+'/month';
+  const ma=Math.max(0,CM-p.startMonth+1);
+  const out=(ma*p.pledge)-(p.paid.length*p.pledge);
+  document.getElementById('pd-balance').textContent=out>0?'Outstanding: ₦'+out.toLocaleString():'✓ All clear';
+  const grid=document.getElementById('pd-months');grid.innerHTML='';
+  MONTHS.forEach((m,i)=>{
+    if(i<p.startMonth)return;
+    const btn=document.createElement('button');
+    btn.className='month-btn'+(p.paid.includes(i)?' paid':'')+(i===CM?' current':'');
+    btn.textContent=m;btn.onclick=()=>togglePaid(id,i,btn);grid.appendChild(btn);
+  });
+  openModal('modal-partner-detail');
+}
+
+function togglePaid(id,month,btn){
+  const p=S.partners.find(x=>x.id===id);if(!p)return;
+  if(p.paid.includes(month)){p.paid=p.paid.filter(m=>m!==month);btn.classList.remove('paid');toast(MF[month]+' marked unpaid');}
+  else{p.paid.push(month);btn.classList.add('paid');toast(MF[month]+' marked paid ✓');}
+  const out=(Math.max(0,CM-p.startMonth+1)*p.pledge)-(p.paid.length*p.pledge);
+  document.getElementById('pd-balance').textContent=out>0?'Outstanding: ₦'+out.toLocaleString():'✓ All clear';
+  save();updatePartnerStats();renderPartners();renderPMonthly();renderPYearly();
+}
+
+function sharePartnerRecord(mode){
+  const p=S.partners.find(x=>x.id===activePid);if(!p)return;
+  const pm=p.paid.map(i=>MF[i]).join(', ')||'None';
+  const out=(Math.max(0,CM-p.startMonth+1)*p.pledge)-(p.paid.length*p.pledge);
+  doShare(`*Souls Aflame Christian Centre*\n*Partnership Record*\n\nName: ${p.name}\nPhone: ${p.phone||'N/A'}\nMonthly Pledge: ₦${p.pledge.toLocaleString()}\nMonths Paid: ${pm}\nOutstanding: ${out>0?'₦'+out.toLocaleString():'Nil'}\n\n_Souls Aflame App_`,mode);
+}
+
+function updatePartnerStats(){
+  document.getElementById('ps-total').textContent=S.partners.length;
+  document.getElementById('ps-paid').textContent=S.partners.filter(p=>p.paid.includes(CM)).length;
+  document.getElementById('ps-unpaid').textContent=S.partners.filter(p=>!p.paid.includes(CM)).length;
+}
+
+function filterPartners(f,btn){
+  pFilter=f;
+  document.querySelectorAll('#pfilter-tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');renderPartners();
+}
+
+function renderPartners(){
+  const q=document.getElementById('partner-search').value.toLowerCase();
+  let list=S.partners.filter(p=>p.name.toLowerCase().includes(q)||(p.phone||'').includes(q));
+  if(pFilter==='paid')list=list.filter(p=>p.paid.includes(CM));
+  if(pFilter==='unpaid')list=list.filter(p=>!p.paid.includes(CM));
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  const el=document.getElementById('partner-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">🤝</div><div class="empty-text">No partners found</div></div>';return;}
+  el.innerHTML=list.map(p=>{
+    const ok=p.paid.includes(CM);
+    return `<div class="list-item" onclick="openPartnerDetail(${p.id})" style="cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div class="list-item-name">${p.name}</div><span class="badge ${ok?'badge-green':'badge-red'}">${ok?'Paid':'Unpaid'}</span></div>
+      <div class="list-item-sub">${p.phone||'No phone'} · ₦${p.pledge.toLocaleString()}/mo</div>
+      <div class="list-item-sub" style="margin-top:4px;">${p.paid.length}/12 paid · Tap to view</div>
+    </div>`;
+  }).join('');
+}
+
+// ── PARTNER MONTHLY ──
+function changePartnerMonth(d){pmMonth+=d;if(pmMonth>11){pmMonth=0;pmYear++;}if(pmMonth<0){pmMonth=11;pmYear--;}renderPMonthly();}
+
+function renderPMonthly(){
+  document.getElementById('pm-label').textContent=MF[pmMonth]+' '+pmYear;
+  const ps=S.partners;
+  const active=ps.filter(p=>p.startMonth<=pmMonth);
+  const paid=active.filter(p=>p.paid.includes(pmMonth));
+  const unpaid=active.filter(p=>!p.paid.includes(pmMonth));
+  const col=paid.reduce((a,p)=>a+p.pledge,0);
+  const out=unpaid.reduce((a,p)=>a+p.pledge,0);
+  const totPledge=active.reduce((a,p)=>a+p.pledge,0);
+  let html=`<div class="stat-row">
+    <div class="stat-pill"><div class="stat-num">${active.length}</div><div class="stat-lbl">Active</div></div>
+    <div class="stat-pill green"><div class="stat-num">${paid.length}</div><div class="stat-lbl">Paid</div></div>
+    <div class="stat-pill red"><div class="stat-num">${unpaid.length}</div><div class="stat-lbl">Unpaid</div></div>
+  </div>
+  <div class="p-stat-section"><div class="p-stat-title">Financial Summary</div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text-soft);">Total Pledge</span><span style="font-weight:700;color:var(--purple);">₦${totPledge.toLocaleString()}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text-soft);">Collected</span><span style="font-weight:700;color:var(--green);">₦${col.toLocaleString()}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px;"><span style="color:var(--text-soft);">Outstanding</span><span style="font-weight:700;color:var(--red);">₦${out.toLocaleString()}</span></div>
+  </div>`;
+  if(paid.length)html+=`<div class="p-stat-section"><div class="p-stat-title" style="color:var(--green);">✓ Paid (${paid.length})</div>${paid.sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${p.name}</span><span style="font-weight:700;color:var(--green);">₦${p.pledge.toLocaleString()}</span></div>`).join('')}</div>`;
+  if(unpaid.length)html+=`<div class="p-stat-section"><div class="p-stat-title" style="color:var(--red);">✗ Unpaid (${unpaid.length})</div>${unpaid.sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${p.name}</span><span style="font-weight:700;color:var(--red);">₦${p.pledge.toLocaleString()}</span></div>`).join('')}</div>`;
+  html+=`<div class="share-row"><button class="btn btn-sm btn-green" onclick="sharePMonthly('plain')">📋 Copy</button><button class="btn btn-sm btn-gold" onclick="sharePMonthly('whatsapp')">💬 WhatsApp</button><button class="btn btn-sm btn-blue" onclick="sharePMonthly('share')">↗ Share</button></div>`;
+  document.getElementById('pm-content').innerHTML=html;
+}
+
+function sharePMonthly(mode){
+  const ps=S.partners,m=pmMonth,y=pmYear;
+  const active=ps.filter(p=>p.startMonth<=m);
+  const paid=active.filter(p=>p.paid.includes(m));
+  const unpaid=active.filter(p=>!p.paid.includes(m));
+  const col=paid.reduce((a,p)=>a+p.pledge,0);
+  const out=unpaid.reduce((a,p)=>a+p.pledge,0);
+  const e=mode!=='plain';
+  let t=e?`⛪ *SOULS AFLAME CHRISTIAN CENTRE*\n🤝 *Partnership Report — ${MF[m]} ${y}*\n${'─'.repeat(30)}\n\n`:`SOULS AFLAME\nPartnership Report — ${MF[m]} ${y}\n${'='.repeat(35)}\n\n`;
+  t+=e?`✅ Paid: ${paid.length}  |  ❌ Unpaid: ${unpaid.length}\n💰 Collected: ₦${col.toLocaleString()}\n📉 Outstanding: ₦${out.toLocaleString()}\n`:`Paid: ${paid.length} | Unpaid: ${unpaid.length}\nCollected: ₦${col.toLocaleString()}\nOutstanding: ₦${out.toLocaleString()}\n`;
+  if(paid.length){t+=e?`\n✅ *Paid:*\n`:`\nPaid:\n`;paid.sort((a,b)=>a.name.localeCompare(b.name)).forEach(p=>{t+=`• ${p.name} — ₦${p.pledge.toLocaleString()}\n`;});}
+  if(unpaid.length){t+=e?`\n❌ *Unpaid:*\n`:`\nUnpaid:\n`;unpaid.sort((a,b)=>a.name.localeCompare(b.name)).forEach(p=>{t+=`• ${p.name} — ₦${p.pledge.toLocaleString()}\n`;});}
+  t+=e?`\n_Souls Aflame App_`:'';
+  doShare(t,mode);
+}
+
+// ── PARTNER YEARLY ──
+function changePartnerYear(d){pyYear+=d;renderPYearly();}
+
+function renderPYearly(){
+  document.getElementById('py-label').textContent='Year '+pyYear;
+  const ps=S.partners;
+  let rows='';let tA=0,tP=0,tC=0,tO=0;
+  MONTHS.forEach((m,i)=>{
+    const active=ps.filter(p=>p.startMonth<=i);
+    const paid=active.filter(p=>p.paid.includes(i));
+    const col=paid.reduce((a,p)=>a+p.pledge,0);
+    const out=active.filter(p=>!p.paid.includes(i)).reduce((a,p)=>a+p.pledge,0);
+    tA=active.length;tP+=paid.length;tC+=col;tO+=out;
+    const cur=i===CM&&pyYear===CY;
+    rows+=`<tr${cur?' class="cur-row"':''}><td>${MF[i]}</td><td>${active.length}</td><td style="color:${paid.length===active.length&&active.length>0?'var(--green)':'var(--red)'}">${paid.length}</td><td>₦${col.toLocaleString()}</td><td>₦${out.toLocaleString()}</td></tr>`;
+  });
+  rows+=`<tr class="totals-row"><td>TOTAL</td><td>${tA}</td><td>${tP}</td><td>₦${tC.toLocaleString()}</td><td>₦${tO.toLocaleString()}</td></tr>`;
+  document.getElementById('py-content').innerHTML=`
+    <div class="yr-table-wrap"><table class="yr-table"><thead><tr><th>Month</th><th>Active</th><th>Paid</th><th>Collected</th><th>Outstanding</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="share-row" style="margin-top:12px;">
+      <button class="btn btn-sm btn-green" onclick="sharePYearly('plain')">📋 Copy</button>
+      <button class="btn btn-sm btn-gold" onclick="sharePYearly('whatsapp')">💬 WhatsApp</button>
+      <button class="btn btn-sm btn-blue" onclick="sharePYearly('share')">↗ Share</button>
+    </div>`;
+}
+
+function sharePYearly(mode){
+  const e=mode!=='plain',y=pyYear;
+  let t=e?`⛪ *SOULS AFLAME CHRISTIAN CENTRE*\n🤝 *Partnership Yearly Report — ${y}*\n${'─'.repeat(30)}\n\n`:`SOULS AFLAME\nPartnership Yearly Report — ${y}\n${'='.repeat(35)}\n\n`;
+  MONTHS.forEach((m,i)=>{
+    const active=S.partners.filter(p=>p.startMonth<=i);
+    const paid=active.filter(p=>p.paid.includes(i));
+    const col=paid.reduce((a,p)=>a+p.pledge,0);
+    const out=active.filter(p=>!p.paid.includes(i)).reduce((a,p)=>a+p.pledge,0);
+    t+=`${MF[i]}: Paid ${paid.length}/${active.length} | Collected ₦${col.toLocaleString()} | Outstanding ₦${out.toLocaleString()}\n`;
+  });
+  t+=e?`\n_Souls Aflame App_`:'';doShare(t,mode);
+}
+
+// ── PARTNER CONTACT ──
+function changePartnerContactMonth(d){pcMonth+=d;if(pcMonth>11){pcMonth=0;pcYear++;}if(pcMonth<0){pcMonth=11;pcYear--;}renderPContact();}
+function getPCKey(id){return `pc_${id}_${pcYear}_${pcMonth}`;}
+function togglePContact(id){S.pContacts[getPCKey(id)]=!S.pContacts[getPCKey(id)];save();renderPContact();}
+
+function renderPContact(){
+  document.getElementById('pc-label').textContent=MF[pcMonth]+' '+pcYear;
+  const ps=[...S.partners].sort((a,b)=>a.name.localeCompare(b.name));
+  const called=ps.filter(p=>S.pContacts[getPCKey(p.id)]).length;
+  document.getElementById('pc-stats').innerHTML=`
+    <div class="stat-pill"><div class="stat-num">${ps.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-pill green"><div class="stat-num">${called}</div><div class="stat-lbl">Called</div></div>
+    <div class="stat-pill red"><div class="stat-num">${ps.length-called}</div><div class="stat-lbl">Not Called</div></div>`;
+  if(!ps.length){document.getElementById('partner-contact-list').innerHTML='<div class="empty"><div class="empty-icon">📞</div><div class="empty-text">No partners yet</div></div>';return;}
+  document.getElementById('partner-contact-list').innerHTML=ps.map(p=>{
+    const ok=!!S.pContacts[getPCKey(p.id)];
+    return `<div class="contact-item"><div><div class="contact-name">${p.name}</div><div class="contact-sub">${p.phone||'No phone'} · ₦${p.pledge.toLocaleString()}/mo</div></div><button class="contact-toggle ${ok?'called':'not-called'}" onclick="togglePContact(${p.id})">${ok?'✓ Called':'Call'}</button></div>`;
+  }).join('');
+}
+
+// ── MEMBER TABS ──
+function switchMemberTab(tab,btn){
+  document.getElementById('mt-records').style.display=tab==='records'?'block':'none';
+  document.getElementById('mt-contact').style.display=tab==='contact'?'block':'none';
+  document.querySelectorAll('#mtabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='contact')renderMContact();
+}
+
+// ── MEMBER RECORDS ──
+function addMember(){
+  const name=document.getElementById('m-name').value.trim();
+  const phone=document.getElementById('m-phone').value.trim();
+  const date=document.getElementById('m-date').value;
+  if(!name){toast('Please enter a name');return;}
+  S.members.push({id:Date.now(),name,phone,date,followup:'not-contacted',retention:'unknown',notes:''});
+  save();renderMembers();updateMemberStats();renderMContact();
+  closeModal('modal-add-member');
+  ['m-name','m-phone'].forEach(id=>document.getElementById(id).value='');
+  toast('Member added ✓');
+}
+
+function deleteMember(){
+  if(!confirm('Delete this member?'))return;
+  S.members=S.members.filter(x=>x.id!==activeMid);
+  save();renderMembers();updateMemberStats();renderMContact();
+  closeModal('modal-member-detail');toast('Deleted');
+}
+
+function openMemberDetail(id){
+  const m=S.members.find(x=>x.id===id);if(!m)return;
+  activeMid=id;
+  document.getElementById('md-name').textContent=m.name;
+  const ds=m.date?new Date(m.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+  document.getElementById('md-info').textContent=(m.phone||'No phone')+(ds?' · First: '+ds:'');
+  document.getElementById('md-followup').value=m.followup;
+  document.getElementById('md-retention').value=m.retention||'unknown';
+  document.getElementById('md-notes').value=m.notes||'';
+  openModal('modal-member-detail');
+}
+
+function updateMemberField(field,value){
+  const m=S.members.find(x=>x.id===activeMid);if(!m)return;
+  m[field]=value;save();renderMembers();updateMemberStats();
+}
+
+function updateMemberStats(){
+  document.getElementById('ms-total').textContent=S.members.length;
+  document.getElementById('ms-serving').textContent=S.members.filter(m=>m.retention==='serving').length;
+  document.getElementById('ms-member').textContent=S.members.filter(m=>m.retention==='member').length;
+  document.getElementById('ms-returned').textContent=S.members.filter(m=>m.retention==='returned').length;
+  document.getElementById('ms-notreturned').textContent=S.members.filter(m=>m.retention==='not-returned').length;
+  document.getElementById('ms-pending').textContent=S.members.filter(m=>m.followup==='not-contacted').length;
+}
+
+function filterMembers(f,btn){
+  mFilter=f;
+  document.querySelectorAll('#mfilter-tabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');renderMembers();
+}
+
+const RLABELS={unknown:'Unknown',returned:'Returned',member:'Member',serving:'Serving','not-returned':'Not Returned'};
+const RBADGES={unknown:'badge-grey',returned:'badge-gold',member:'badge-blue',serving:'badge-green','not-returned':'badge-red'};
+
+function renderMembers(){
+  const q=document.getElementById('member-search').value.toLowerCase();
+  let list=S.members.filter(m=>m.name.toLowerCase().includes(q)||(m.phone||'').includes(q));
+  if(mFilter==='serving')list=list.filter(m=>m.retention==='serving');
+  else if(mFilter==='member')list=list.filter(m=>m.retention==='member');
+  else if(mFilter==='returned')list=list.filter(m=>m.retention==='returned');
+  else if(mFilter==='not-returned')list=list.filter(m=>m.retention==='not-returned');
+  list.sort((a,b)=>a.name.localeCompare(b.name));
+  const el=document.getElementById('member-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">No members found</div></div>';return;}
+  el.innerHTML=list.map(m=>{
+    const r=m.retention||'unknown';
+    const ds=m.date?new Date(m.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'';
+    return `<div class="list-item" onclick="openMemberDetail(${m.id})" style="cursor:pointer;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;"><div class="list-item-name">${m.name}</div><span class="badge ${RBADGES[r]||'badge-grey'}">${RLABELS[r]||'Unknown'}</span></div>
+      <div class="list-item-sub">${m.phone||'No phone'}${ds?' · '+ds:''}</div>
+      <div style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;">
+        <span class="badge ${m.followup==='contacted'?'badge-gold':'badge-purple'}">${m.followup==='contacted'?'Contacted':'Not Contacted'}</span>
+        ${m.notes?`<span style="font-size:11px;color:var(--text-soft);">📝 ${m.notes.slice(0,28)}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MEMBER CONTACT ──
+function updateWeekLabel(){
+  const ws=getWeekStart();const we=new Date(ws);we.setDate(we.getDate()+6);
+  document.getElementById('mc-week-label').textContent=ws.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})+' – '+we.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+function getMCKey(id){return `mc_${id}_${getWeekKey()}`;}
+function toggleMContact(id){S.mContacts[getMCKey(id)]=!S.mContacts[getMCKey(id)];save();renderMContact();}
+
+function renderMContact(){
+  const ms=[...S.members].sort((a,b)=>a.name.localeCompare(b.name));
+  const called=ms.filter(m=>S.mContacts[getMCKey(m.id)]).length;
+  document.getElementById('mc-stats').innerHTML=`
+    <div class="stat-pill"><div class="stat-num">${ms.length}</div><div class="stat-lbl">Total</div></div>
+    <div class="stat-pill green"><div class="stat-num">${called}</div><div class="stat-lbl">Called</div></div>
+    <div class="stat-pill red"><div class="stat-num">${ms.length-called}</div><div class="stat-lbl">Not Called</div></div>`;
+  if(!ms.length){document.getElementById('member-contact-list').innerHTML='<div class="empty"><div class="empty-icon">📞</div><div class="empty-text">No members yet</div></div>';return;}
+  document.getElementById('member-contact-list').innerHTML=ms.map(m=>{
+    const ok=!!S.mContacts[getMCKey(m.id)];
+    return `<div class="contact-item"><div><div class="contact-name">${m.name}</div><div class="contact-sub">${m.phone||'No phone'}</div></div><button class="contact-toggle ${ok?'called':'not-called'}" onclick="toggleMContact(${m.id})">${ok?'✓ Called':'Call'}</button></div>`;
+  }).join('');
+}
+
+// ── STATS TABS ──
+function switchStatsTab(tab,btn){
+  document.getElementById('st-monthly').style.display=tab==='monthly'?'block':'none';
+  document.getElementById('st-yearly').style.display=tab==='yearly'?'block':'none';
+  document.querySelectorAll('#stabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='yearly')renderYearly();
+}
+
+function toggleCustomService(){document.getElementById('svc-custom-wrap').style.display=document.getElementById('svc-type').value==='other'?'block':'none';}
+function autoCalcTotal(){
+  const g=id=>parseInt(document.getElementById(id).value)||0;
+  const t=g('svc-adults')+g('svc-kids')+g('svc-firsttimers')+g('svc-visitors');
+  document.getElementById('svc-total').value=t||'';
+}
+
+function addService(){
+  const date=document.getElementById('svc-date').value;
+  const tv=document.getElementById('svc-type').value;
+  const type=tv==='other'?(document.getElementById('svc-custom').value.trim()||'Other Service'):tv;
+  const adults=parseInt(document.getElementById('svc-adults').value)||0;
+  const kids=parseInt(document.getElementById('svc-kids').value)||0;
+  const ft=parseInt(document.getElementById('svc-firsttimers').value)||0;
+  const vis=parseInt(document.getElementById('svc-visitors').value)||0;
+  const ti=parseInt(document.getElementById('svc-total').value);
+  const total=isNaN(ti)?(adults+kids+ft+vis):ti;
+  const notes=document.getElementById('svc-notes').value.trim();
+  if(!date){toast('Please select a date');return;}
+  const d=new Date(date);
+  S.services.push({id:Date.now(),date,month:d.getMonth(),year:d.getFullYear(),type,adults,kids,firsttimers:ft,visitors:vis,total,notes});
+  S.services.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  save();renderStats();
+  closeModal('modal-add-service');
+  ['svc-adults','svc-kids','svc-firsttimers','svc-visitors','svc-total','svc-notes','svc-custom'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('svc-type').value='Sunday Service';document.getElementById('svc-custom-wrap').style.display='none';
+  toast('Service logged ✓');
+}
+
+function deleteService(){
+  if(!confirm('Delete this record?'))return;
+  S.services=S.services.filter(s=>s.id!==activeSid);save();renderStats();closeModal('modal-service-detail');toast('Deleted');
+}
+
+function openServiceDetail(id){
+  const s=S.services.find(x=>x.id===id);if(!s)return;activeSid=id;
+  document.getElementById('svd-title').textContent=s.type;
+  document.getElementById('svd-date').textContent=new Date(s.date).toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('svd-stats').innerHTML=`
+    <div class="stat-pill blue"><div class="stat-num">${s.adults}</div><div class="stat-lbl">Adults</div></div>
+    <div class="stat-pill green"><div class="stat-num">${s.kids}</div><div class="stat-lbl">Kids</div></div>
+    <div class="stat-pill gold"><div class="stat-num">${s.firsttimers}</div><div class="stat-lbl">1st Timers</div></div>
+    <div class="stat-pill red"><div class="stat-num">${s.visitors}</div><div class="stat-lbl">Visitors</div></div>
+    <div class="stat-pill"><div class="stat-num">${s.total}</div><div class="stat-lbl">Total</div></div>`;
+  const nw=document.getElementById('svd-notes-wrap');
+  if(s.notes){nw.style.display='block';document.getElementById('svd-notes').textContent=s.notes;}else{nw.style.display='none';}
+  openModal('modal-service-detail');
+}
+
+function changeStatsMonth(d){sMonth+=d;if(sMonth>11){sMonth=0;sYear++;}if(sMonth<0){sMonth=11;sYear--;}renderStats();}
+function changeStatsYear(d){sYearView+=d;renderYearly();}
+function getSvcs(m,y){return S.services.filter(s=>s.month===m&&s.year===y);}
+const sum=(arr,k)=>arr.reduce((a,s)=>a+(s[k]||0),0);
+
+function renderStats(){
+  document.getElementById('stats-month-label').textContent=MF[sMonth]+' '+sYear;
+  const svcs=getSvcs(sMonth,sYear);
+  document.getElementById('st-services').textContent=svcs.length;
+  document.getElementById('st-adults').textContent=sum(svcs,'adults');
+  document.getElementById('st-kids').textContent=sum(svcs,'kids');
+  document.getElementById('st-firsttimers').textContent=sum(svcs,'firsttimers');
+  document.getElementById('st-visitors').textContent=sum(svcs,'visitors');
+  document.getElementById('st-total-att').textContent=sum(svcs,'total');
+  const el=document.getElementById('service-list');
+  if(!svcs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No services logged for this month</div></div>';return;}
+  el.innerHTML=svcs.map(s=>`
+    <div class="svc-card" onclick="openServiceDetail(${s.id})">
+      <div class="svc-card-top"><div><div class="svc-date">${new Date(s.date).toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'})}</div><div class="svc-type">${s.type}</div></div><span class="badge badge-purple">${s.total} total</span></div>
+      <div class="svc-nums"><span class="svc-num">Adults: <span>${s.adults}</span></span><span class="svc-num">Kids: <span>${s.kids}</span></span><span class="svc-num">1st Timers: <span>${s.firsttimers}</span></span><span class="svc-num">Visitors: <span>${s.visitors}</span></span></div>
+      ${s.notes?`<div style="font-size:11px;color:var(--text-soft);margin-top:6px;">📝 ${s.notes.slice(0,50)}${s.notes.length>50?'…':''}</div>`:''}
+    </div>`).join('');
+}
+
+function renderYearly(){
+  document.getElementById('stats-year-label').textContent='Year '+sYearView;
+  let tS=0,tA=0,tK=0,tF=0,tV=0,tT=0;
+  const rows=MONTHS.map((m,i)=>{
+    const svcs=getSvcs(i,sYearView);
+    const a=sum(svcs,'adults'),k=sum(svcs,'kids'),f=sum(svcs,'firsttimers'),v=sum(svcs,'visitors'),t=sum(svcs,'total');
+    tS+=svcs.length;tA+=a;tK+=k;tF+=f;tV+=v;tT+=t;
+    const cur=i===CM&&sYearView===CY;
+    return `<tr${cur?' class="cur-row"':''}><td>${MF[i]}</td><td>${svcs.length}</td><td>${a}</td><td>${k}</td><td>${f}</td><td>${v}</td><td style="font-weight:700;">${t}</td></tr>`;
+  }).join('');
+  document.getElementById('yearly-table').innerHTML=`<thead><tr><th>Month</th><th>Svcs</th><th>Adults</th><th>Kids</th><th>1st</th><th>Vis</th><th>Total</th></tr></thead><tbody>${rows}<tr class="totals-row"><td>TOTAL</td><td>${tS}</td><td>${tA}</td><td>${tK}</td><td>${tF}</td><td>${tV}</td><td>${tT}</td></tr></tbody>`;
+}
+
+function buildMonthlyReport(e){
+  const svcs=getSvcs(sMonth,sYear);const ml=MF[sMonth]+' '+sYear;
+  let t=e?`⛪ *SOULS AFLAME CHRISTIAN CENTRE*\n📊 *Monthly Statistics — ${ml}*\n${'─'.repeat(30)}\n\n`:`SOULS AFLAME CHRISTIAN CENTRE\nMonthly Statistics — ${ml}\n${'='.repeat(35)}\n\n`;
+  t+=e?`🗓️ *Services:* ${svcs.length}\n👨 *Adults:* ${sum(svcs,'adults')}\n👶 *Kids:* ${sum(svcs,'kids')}\n🌟 *1st Timers:* ${sum(svcs,'firsttimers')}\n🙋 *Visitors:* ${sum(svcs,'visitors')}\n✅ *Total:* ${sum(svcs,'total')}\n`:`Services: ${svcs.length}\nAdults: ${sum(svcs,'adults')}\nKids: ${sum(svcs,'kids')}\n1st Timers: ${sum(svcs,'firsttimers')}\nVisitors: ${sum(svcs,'visitors')}\nTotal: ${sum(svcs,'total')}\n`;
+  if(svcs.length){
+    t+=e?`\n${'─'.repeat(30)}\n📅 *Per Service:*\n`:`\n${'='.repeat(35)}\nPer Service:\n`;
+    svcs.forEach(s=>{const d=new Date(s.date).toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'});t+=e?`\n• *${d} — ${s.type}*\n  Adults: ${s.adults} | Kids: ${s.kids} | 1st: ${s.firsttimers} | Vis: ${s.visitors} | Total: ${s.total}`:`\n${d} — ${s.type}\nAdults: ${s.adults} | Kids: ${s.kids} | 1st: ${s.firsttimers} | Vis: ${s.visitors} | Total: ${s.total}`;if(s.notes)t+=`\n  📝 ${s.notes}`;t+='\n';});
+  }
+  t+=e?`\n_Souls Aflame App_`:'';return t;
+}
+
+function shareMonthly(mode){doShare(buildMonthlyReport(mode!=='plain'),mode);}
+
+function shareYearly(mode){
+  const e=mode!=='plain',y=sYearView;
+  let t=e?`⛪ *SOULS AFLAME CHRISTIAN CENTRE*\n📊 *Yearly Statistics — ${y}*\n${'─'.repeat(30)}\n\n`:`SOULS AFLAME CHRISTIAN CENTRE\nYearly Statistics — ${y}\n${'='.repeat(35)}\n\n`;
+  MONTHS.forEach((m,i)=>{const svcs=getSvcs(i,y);t+=`${MF[i]}: ${svcs.length} services | Adults ${sum(svcs,'adults')} | Kids ${sum(svcs,'kids')} | 1st Timers ${sum(svcs,'firsttimers')} | Visitors ${sum(svcs,'visitors')} | Total ${sum(svcs,'total')}\n`;});
+  t+=e?`\n_Souls Aflame App_`:'';doShare(t,mode);
+}
+
+function shareService(mode){
+  const s=S.services.find(x=>x.id===activeSid);if(!s)return;
+  const d=new Date(s.date).toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const e=mode!=='plain';
+  doShare(e?`⛪ *SOULS AFLAME CHRISTIAN CENTRE*\n📋 *Service Record*\n${'─'.repeat(30)}\n\n🗓️ ${d}\n🏛️ ${s.type}\n\n👨 Adults: ${s.adults}\n👶 Kids: ${s.kids}\n🌟 1st Timers: ${s.firsttimers}\n🙋 Visitors: ${s.visitors}\n✅ Total: ${s.total}${s.notes?'\n\n📝 '+s.notes:''}\n\n_Souls Aflame App_`:`SOULS AFLAME\nService Record\n${d}\n${s.type}\n\nAdults: ${s.adults}\nKids: ${s.kids}\n1st Timers: ${s.firsttimers}\nVisitors: ${s.visitors}\nTotal: ${s.total}${s.notes?'\nRemarks: '+s.notes:''}`,mode);
+}
+
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+init();
+</script>
+</body>
+</html>
